@@ -32,6 +32,13 @@ local focus_switch_byd = function(dir)
 	end
 end
 
+local focus_switch_byid = function(id)
+	return function()
+		awful.client.focus.byidx(id)
+		if client.focus then client.focus:raise() end
+	end
+end
+
 local function minimize_all()
 	for _, c in ipairs(client.get()) do
 		if current(c, mouse.screen) then c.minimized = true end
@@ -325,19 +332,42 @@ function hotkeys:init(args)
 			{ env.mod }, "Return", function() awful.spawn(env.terminal) end,
 			{ description = "Open a terminal", group = "Main" }
 		},
-
 		{
 			{ env.mod }, "l", focus_switch_byd("right"),
 			{ description = "Go to right client", group = "Client focus" }
 		},
 		{
-			{ env.mod }, "j", focus_switch_byd("left"),
-			{ description = "Go to left client", group = "Client focus" }
+			{ env.mod }, "j", focus_switch_byid(1),
+			{ description = "Go to next client", group = "Client focus" }
 		},
-		{
-			{ env.mod }, "i", focus_switch_byd("up"),
-			{ description = "Go to upper client", group = "Client focus" }
+    {
+			{ env.mod }, "k", focus_switch_byid(-1),
+			{ description = "Go to previous client", group = "Client focus" }
 		},
+-- 		{
+-- 			{ env.mod }, "j", focus_switch_byd("left"),
+-- 			{ description = "Go to left client", group = "Client focus" }
+-- 		},
+-- 		{
+-- 			{ env.mod }, "i", focus_switch_byd("up"),
+-- 			{ description = "Go to upper client", group = "Client focus" }
+-- 		},
+--    {
+--      { env.mod }, "j", function () awful.client.swap.byidx(  1)    end,
+--			{ description = "Swap next client", group = "Client focus" }
+--    },
+--    {
+--      { env.mod }, "k", function () awful.client.swap.byidx( -1)    end,
+--			{ description = "Swap previous client", group = "Client focus" }
+--    },
+    {
+      { env.mod, "Control" }, "j", function () awful.screen.focus_relative( 1) end,
+			{ description = "Swap next screen", group = "Client focus" }
+    },
+    {
+      { env.mod, "Control" }, "k", function () awful.screen.focus_relative(-1) end,
+			{ description = "Swap previous screen", group = "Client focus" }
+    },
 		{
 			{ env.mod }, "k", focus_switch_byd("down"),
 			{ description = "Go to lower client", group = "Client focus" }
@@ -479,7 +509,11 @@ function hotkeys:init(args)
 		{
 			{ env.mod }, "m", function(c) c.maximized = not c.maximized; c:raise() end,
 			{ description = "Maximize", group = "Client keys" }
-		}
+		},
+    {
+      { env.mod,           }, "o", awful.client.movetoscreen,
+      { description = "Move client to screen", group = "Client keys" }
+    },
 	}
 
 	self.keys.root = redflat.util.key.build(self.raw.root)
