@@ -431,6 +431,26 @@ function hotkeys:init(args)
 			{ env.mod, "Down" }, "Left", function() awful.layout.inc(-1) end,
 			{ description = "Select previous layout", group = "Layouts" }
 		},
+		{
+			{ env.mod, "Control" }, "l", function() awful.spawn(env.screensaver) end,
+			{ description = "Lock screen", group = "Main" }
+		},
+		{
+			{ env.mod, "Control" }, "Right", function() 
+            for s in screen do
+              awful.tag.viewnext(s)
+            end
+          end,
+			{ description = "View next tag on all screens", group = "Main" }
+		},
+		{
+			{ env.mod, "Control" }, "Left", function()
+            for s in screen do
+              awful.tag.viewprev(s)
+            end
+          end,
+			{ description = "View previous tag on all screens", group = "Main" }
+		},
 	}
 
 	-- Client keys

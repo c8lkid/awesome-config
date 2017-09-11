@@ -16,6 +16,9 @@ require("awful.autofocus")
 -- User modules
 ------------------------------------------------------------
 local redflat = require("redflat")
+-- 
+-- global module
+timestamp = require("redflat.timestamp")
 
 
 -- Error handling
@@ -26,7 +29,7 @@ require("colorless.ercheck-config") -- load file with error handling
 -- Setup theme and environment vars
 -----------------------------------------------------------------------------------------------------------------------
 local env = require("colorless.env-config") -- load file with environment
-env:init()
+env:init({ terminal = "urxvt" })
 
 
 -- Layouts setup
@@ -99,6 +102,52 @@ tray.buttons = awful.util.table.join(
 	awful.button({}, 1, function() redflat.widget.minitray:toggle() end)
 )
 
+-- Keyboard layout indicator
+--------------------------------------------------------------------------------
+local kbindicator = {}
+kbindicator.widget = redflat.widget.keyboard({ layouts = { "English", "Russian" } })
+
+kbindicator.buttons = awful.util.table.join(
+	awful.button({}, 1, function () redflat.widget.keyboard:toggle_menu() end),
+	awful.button({}, 4, function () redflat.widget.keyboard:toggle()      end),
+	awful.button({}, 5, function () redflat.widget.keyboard:toggle(true)  end)
+)
+
+-- System resource monitoring widgets
+--------------------------------------------------------------------------------
+local sysmon = { widget = {}, buttons = {} }
+
+-- battery
+sysmon.widget.battery = redflat.widget.sysmon(
+	{ func = redflat.system.pformatted.bat(25), arg = "BAT1" },
+	{ timeout = 60, monitor = { label = "BAT" } }
+)
+
+-- network speed
+sysmon.widget.network = redflat.widget.net(
+	{ interface = "enp1s0", speed = { up = 5 * 1024^2, down = 5 * 1024^2 }, autoscale = false },
+	{ timeout = 2 }
+)
+
+-- CPU usage
+sysmon.widget.cpu = redflat.widget.sysmon(
+	{ func = redflat.system.pformatted.cpu(80) },
+	{ timeout = 2, monitor = { label = "CPU" } }
+)
+
+sysmon.buttons.cpu = awful.util.table.join(
+	awful.button({ }, 1, function() redflat.float.top:show("cpu") end)
+)
+
+-- RAM usage
+sysmon.widget.ram = redflat.widget.sysmon(
+	{ func = redflat.system.pformatted.mem(80) },
+	{ timeout = 10, monitor = { label = "RAM" } }
+)
+
+sysmon.buttons.ram = awful.util.table.join(
+	awful.button({ }, 1, function() redflat.float.top:show("mem") end)
+)
 
 -- Screen setup
 -----------------------------------------------------------------------------------------------------------------------
@@ -108,7 +157,7 @@ awful.screen.connect_for_each_screen(
 		env.wallpaper(s)
 
 		-- tags
-		awful.tag({ "Tag1", "Tag2", "Tag3", "Tag4", "Tag5" }, s, awful.layout.layouts[1])
+		awful.tag({ "Tag1", "Tag2", "Tag3", "Tag4", "Tag5" }, s, awful.layout.layouts[6])
 
 		-- layoutbox widget
 		layoutbox[s] = redflat.widget.layoutbox({ screen = s })
@@ -120,7 +169,7 @@ awful.screen.connect_for_each_screen(
 		tasklist[s] = redflat.widget.tasklist({ screen = s, buttons = tasklist.buttons })
 
 		-- panel wibox
-		s.panel = awful.wibar({ position = "bottom", screen = s, height = beautiful.panel_height or 36 })
+		s.panel = awful.wibar({ position = "top", screen = s, height = beautiful.panel_height or 36 })
 
 		-- add widgets to the wibox
 		s.panel:setup {
@@ -147,9 +196,18 @@ awful.screen.connect_for_each_screen(
 				separator,
 				env.wrapper(layoutbox[s], "layoutbox", layoutbox.buttons),
 				separator,
+				env.wrapper(sysmon.widget.network, "network"),
+				separator,
+				env.wrapper(sysmon.widget.cpu, "cpu", sysmon.buttons.cpu),
+				separator,
+				env.wrapper(sysmon.widget.ram, "ram", sysmon.buttons.ram),
+				separator,
+				env.wrapper(kbindicator.widget, "keyboard", kbindicator.buttons),
+				separator,
 				env.wrapper(textclock.widget, "textclock"),
 				separator,
 				env.wrapper(tray.widget, "tray", tray.buttons),
+				separator,
 			},
 		}
 	end
@@ -178,3 +236,11 @@ titlebar:init()
 -----------------------------------------------------------------------------------------------------------------------
 local signals = require("colorless.signals-config") -- load file with signals configuration
 signals:init({ env = env })
+
+-- Autostart user applications
+-----------------------------------------------------------------------------------------------------------------------
+local autostart = require("colorless.autostart-config") -- load file with autostart application list
+
+if timestamp.is_startup() then
+	autostart.run()
+end

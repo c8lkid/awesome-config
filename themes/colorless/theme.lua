@@ -217,6 +217,7 @@ theme.widget.wrapper = {
 	textclock   = { 12, 12, 0, 0 },
 	taglist     = { 4, 4, 0, 0 },
 	tray        = { 10, 12, 7, 7 },
+	keyboard    = { 4, 4, 5, 5 },
 	-- tasklist    = { 0, 70, 0, 0 }, -- centering tasklist widget
 }
 
@@ -398,6 +399,20 @@ theme.float.qlaunch = {
 	no_icon       = theme.path .. "/common/unknown.svg",
 	label_font    = theme.fonts.qlaunch,
 	color         = theme.color,
+}
+
+-- Keyboard layout indicator
+------------------------------------------------------------
+theme.widget.keyboard = {
+	icon         = theme.path .. "/widget/keyboard.svg",
+	micon        = theme.icon,
+	layout_color = { theme.color.icon, theme.color.main }
+}
+
+theme.widget.keyboard.menu = {
+	width        = 180,
+	color        = { right_icon = theme.color.icon },
+	nohide       = true
 }
 
 -- Hotkeys helper
