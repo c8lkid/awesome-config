@@ -102,6 +102,17 @@ tray.buttons = awful.util.table.join(
 	awful.button({}, 1, function() redflat.widget.minitray:toggle() end)
 )
 
+-- PA volume control
+--------------------------------------------------------------------------------
+local volume = {}
+volume.widget = redflat.widget.pulse(nil, { widget = redflat.gauge.audio.blue.new })
+
+volume.buttons = awful.util.table.join(
+	awful.button({}, 4, function() redflat.widget.pulse:change_volume()                end),
+	awful.button({}, 5, function() redflat.widget.pulse:change_volume({ down = true }) end),
+	awful.button({}, 2, function() redflat.widget.pulse:mute()                         end)
+)
+
 -- Keyboard layout indicator
 --------------------------------------------------------------------------------
 local kbindicator = {}
@@ -151,68 +162,235 @@ sysmon.buttons.ram = awful.util.table.join(
 
 -- Screen setup
 -----------------------------------------------------------------------------------------------------------------------
-awful.screen.connect_for_each_screen(
-	function(s)
-		-- wallpaper
-		env.wallpaper(s)
+-- awful.screen.connect_for_each_screen(
+-- 	function(s)
+-- 		-- wallpaper
+-- 		env.wallpaper(s)
+-- 
+-- 		-- tags
+-- 		awful.tag({ "Tag1", "Tag2", "Tag3", "Tag4", "Tag5" }, s, awful.layout.layouts[6])
+-- 
+-- 		-- layoutbox widget
+-- 		layoutbox[s] = redflat.widget.layoutbox({ screen = s })
+-- 
+-- 		-- taglist widget
+-- 		taglist[s] = redflat.widget.taglist({ screen = s, buttons = taglist.buttons, hint = env.tagtip }, taglist.style)
+-- 
+-- 		-- tasklist widget
+-- 		tasklist[s] = redflat.widget.tasklist({ screen = s, buttons = tasklist.buttons })
+-- 
+-- 		-- panel wibox
+-- 		s.panel = awful.wibar({ position = "top", screen = s, height = beautiful.panel_height or 36 })
+-- 
+-- 		-- add widgets to the wibox
+-- 		s.panel:setup {
+-- 			layout = wibox.layout.align.horizontal,
+-- 			{ -- left widgets
+-- 				layout = wibox.layout.fixed.horizontal,
+-- 
+-- 				env.wrapper(mymenu.widget, "mainmenu", mymenu.buttons),
+-- 				separator,
+-- 				env.wrapper(taglist[s], "taglist"),
+-- 				separator,
+-- 				s.mypromptbox,
+-- 				env.wrapper(layoutbox[s], "layoutbox", layoutbox.buttons),
+-- 				separator,
+-- 			},
+-- 			{ -- middle widget
+-- 				layout = wibox.layout.align.horizontal,
+-- 				expand = "outside",
+-- 
+-- 				nil,
+-- 				env.wrapper(tasklist[s], "tasklist"),
+-- 			},
+-- 			{ -- right widgets
+-- 				layout = wibox.layout.fixed.horizontal,
+-- 
+-- 				separator,
+-- 				env.wrapper(kbindicator.widget, "keyboard", kbindicator.buttons),
+-- 				separator,
+-- 				env.wrapper(sysmon.widget.network, "network"),
+-- 				separator,
+-- 				env.wrapper(sysmon.widget.cpu, "cpu", sysmon.buttons.cpu),
+-- 				separator,
+-- 				env.wrapper(sysmon.widget.ram, "ram", sysmon.buttons.ram),
+-- 				separator,
+-- 				env.wrapper(textclock.widget, "textclock"),
+-- 				separator,
+-- 				env.wrapper(tray.widget, "tray", tray.buttons),
+-- 				separator,
+-- 			},
+-- 		}
+-- 	end
+-- )
 
-		-- tags
-		awful.tag({ "Tag1", "Tag2", "Tag3", "Tag4", "Tag5" }, s, awful.layout.layouts[6])
+-- TODO: Refactor this
+-- Set wibox on second screen if exists-----------------
+-- ---------------------------------------------------------------
+if screen:count() > 1 then
+  s = screen[1]
+    -- wallpaper
+  env.wallpaper(s)
 
-		-- layoutbox widget
-		layoutbox[s] = redflat.widget.layoutbox({ screen = s })
+  -- tags
+  awful.tag({ "Tag1", "Tag2", "Tag3", "Tag4", "Tag5" }, s, awful.layout.layouts[6])
 
-		-- taglist widget
-		taglist[s] = redflat.widget.taglist({ screen = s, buttons = taglist.buttons, hint = env.tagtip }, taglist.style)
+  -- layoutbox widget
+  layoutbox[s] = redflat.widget.layoutbox({ screen = s })
 
-		-- tasklist widget
-		tasklist[s] = redflat.widget.tasklist({ screen = s, buttons = tasklist.buttons })
+  -- taglist widget
+  taglist[s] = redflat.widget.taglist({ screen = s, buttons = taglist.buttons, hint = env.tagtip }, taglist.style)
 
-		-- panel wibox
-		s.panel = awful.wibar({ position = "top", screen = s, height = beautiful.panel_height or 36 })
+  -- tasklist widget
+  tasklist[s] = redflat.widget.tasklist({ screen = s, buttons = tasklist.buttons })
 
-		-- add widgets to the wibox
-		s.panel:setup {
+  -- panel wibox
+  s.panel = awful.wibar({ position = "top", screen = s, height = beautiful.panel_height or 36 })
+
+  -- add widgets to the wibox
+  s.panel:setup {
+    layout = wibox.layout.align.horizontal,
+    { -- left widgets
+      layout = wibox.layout.fixed.horizontal,
+
+      env.wrapper(mymenu.widget, "mainmenu", mymenu.buttons),
+      separator,
+      env.wrapper(taglist[s], "taglist"),
+      separator,
+      s.mypromptbox,
+      env.wrapper(layoutbox[s], "layoutbox", layoutbox.buttons),
+      separator,
+    },
+    { -- middle widget
+      layout = wibox.layout.align.horizontal,
+      expand = "outside",
+
+      nil,
+      env.wrapper(tasklist[s], "tasklist"),
+    },
+  }
+
+  s = screen[2]
+	env.wallpaper(s)
+
+	-- tags
+	awful.tag({ "Tag1", "Tag2", "Tag3", "Tag4", "Tag5" }, s, awful.layout.layouts[6])
+
+	-- layoutbox widget
+	layoutbox[s] = redflat.widget.layoutbox({ screen = s })
+
+	-- taglist widget
+	taglist[s] = redflat.widget.taglist({ screen = s, buttons = taglist.buttons, hint = env.tagtip }, taglist.style)
+
+	-- tasklist widget
+	tasklist[s] = redflat.widget.tasklist({ screen = s, buttons = tasklist.buttons })
+
+	-- panel wibox
+	s.panel = awful.wibar({ position = "top", screen = s, height = beautiful.panel_height or 36 })
+
+	-- add widgets to the wibox
+	s.panel:setup {
+		layout = wibox.layout.align.horizontal,
+		{ -- left widgets
+			layout = wibox.layout.fixed.horizontal,
+
+			env.wrapper(mymenu.widget, "mainmenu", mymenu.buttons),
+			separator,
+			env.wrapper(taglist[s], "taglist"),
+			separator,
+			s.mypromptbox,
+			env.wrapper(layoutbox[s], "layoutbox", layoutbox.buttons),
+			separator,
+		},
+		{ -- middle widget
 			layout = wibox.layout.align.horizontal,
-			{ -- left widgets
-				layout = wibox.layout.fixed.horizontal,
+			expand = "outside",
 
-				env.wrapper(mymenu.widget, "mainmenu", mymenu.buttons),
-				separator,
-				env.wrapper(taglist[s], "taglist"),
-				separator,
-				s.mypromptbox,
-			},
-			{ -- middle widget
-				layout = wibox.layout.align.horizontal,
-				expand = "outside",
+			nil,
+			env.wrapper(tasklist[s], "tasklist"),
+		},
+		{ -- right widgets
+			layout = wibox.layout.fixed.horizontal,
 
-				nil,
-				env.wrapper(tasklist[s], "tasklist"),
-			},
-			{ -- right widgets
-				layout = wibox.layout.fixed.horizontal,
+			separator,
+			env.wrapper(kbindicator.widget, "keyboard", kbindicator.buttons),
+      separator,
+      env.wrapper(volume.widget, "volume", volume.buttons),
+			separator,
+			env.wrapper(sysmon.widget.network, "network"),
+			separator,
+			env.wrapper(sysmon.widget.cpu, "cpu", sysmon.buttons.cpu),
+			separator,
+			env.wrapper(sysmon.widget.ram, "ram", sysmon.buttons.ram),
+			separator,
+			env.wrapper(textclock.widget, "textclock"),
+			separator,
+			env.wrapper(tray.widget, "tray", tray.buttons),
+			separator,
+		},
+	}
+else
+  s = screen[1]
+  env.wallpaper(s)
 
-				separator,
-				env.wrapper(layoutbox[s], "layoutbox", layoutbox.buttons),
-				separator,
-				env.wrapper(sysmon.widget.network, "network"),
-				separator,
-				env.wrapper(sysmon.widget.cpu, "cpu", sysmon.buttons.cpu),
-				separator,
-				env.wrapper(sysmon.widget.ram, "ram", sysmon.buttons.ram),
-				separator,
-				env.wrapper(kbindicator.widget, "keyboard", kbindicator.buttons),
-				separator,
-				env.wrapper(textclock.widget, "textclock"),
-				separator,
-				env.wrapper(tray.widget, "tray", tray.buttons),
-				separator,
-			},
-		}
-	end
-)
+  -- tags
+  awful.tag({ "Tag1", "Tag2", "Tag3", "Tag4", "Tag5" }, s, awful.layout.layouts[6])
 
+  -- layoutbox widget
+  layoutbox[s] = redflat.widget.layoutbox({ screen = s })
+
+  -- taglist widget
+  taglist[s] = redflat.widget.taglist({ screen = s, buttons = taglist.buttons, hint = env.tagtip }, taglist.style)
+
+  -- tasklist widget
+  tasklist[s] = redflat.widget.tasklist({ screen = s, buttons = tasklist.buttons })
+
+  -- panel wibox
+  s.panel = awful.wibar({ position = "top", screen = s, height = beautiful.panel_height or 36 })
+
+  -- add widgets to the wibox
+  s.panel:setup {
+    layout = wibox.layout.align.horizontal,
+    { -- left widgets
+      layout = wibox.layout.fixed.horizontal,
+
+      env.wrapper(mymenu.widget, "mainmenu", mymenu.buttons),
+      separator,
+      env.wrapper(taglist[s], "taglist"),
+      separator,
+      s.mypromptbox,
+      env.wrapper(layoutbox[s], "layoutbox", layoutbox.buttons),
+      separator,
+    },
+    { -- middle widget
+      layout = wibox.layout.align.horizontal,
+      expand = "outside",
+
+      nil,
+      env.wrapper(tasklist[s], "tasklist"),
+    },
+    { -- right widgets
+      layout = wibox.layout.fixed.horizontal,
+
+      separator,
+      env.wrapper(volume.widget, "volume", volume.buttons),
+      separator,
+      env.wrapper(kbindicator.widget, "keyboard", kbindicator.buttons),
+      separator,
+      env.wrapper(sysmon.widget.network, "network"),
+      separator,
+      env.wrapper(sysmon.widget.cpu, "cpu", sysmon.buttons.cpu),
+      separator,
+      env.wrapper(sysmon.widget.ram, "ram", sysmon.buttons.ram),
+      separator,
+      env.wrapper(textclock.widget, "textclock"),
+      separator,
+      env.wrapper(tray.widget, "tray", tray.buttons),
+      separator,
+    },
+  }
+end
+-----------------------------------------------------------------------------------------------------------------------
 
 -- Key bindings
 -----------------------------------------------------------------------------------------------------------------------

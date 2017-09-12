@@ -466,6 +466,10 @@ function hotkeys:init(args)
 			{ description = "Lock screen", group = "Main" }
 		},
 		{
+			{ env.mod }, "Print", function() awful.spawn(env.screenshooter) end,
+			{ description = "Lock screen", group = "Main" }
+		},
+		{
 			{ env.mod, "Control" }, "Right", function() 
             for s in screen do
               awful.tag.viewnext(s)

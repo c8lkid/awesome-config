@@ -162,7 +162,7 @@ theme.menu.color = {
 
 -- Gauge style
 -----------------------------------------------------------------------------------------------------------------------
-theme.gauge = { tag = {}, task = {}, graph = {}}
+theme.gauge = { tag = {}, audio = {}, task = {}, graph = {}}
 
 -- Separator
 ------------------------------------------------------------
@@ -204,7 +204,19 @@ theme.gauge.graph.dots = {
 	color        = theme.color
 }
 
-
+-- Volume indicator
+------------------------------------------------------------
+theme.gauge.audio.red = {
+	icon = {
+		ready = theme.path .. "/widget/audio.svg",
+		mute  = theme.path .. "/widget/mute.svg"
+	},
+	color = {
+		main = theme.color.main,
+		icon = theme.color.icon,
+		mute = theme.color.gray
+	}
+}
 -- Panel widgets
 -----------------------------------------------------------------------------------------------------------------------
 theme.widget = {}
@@ -226,6 +238,12 @@ theme.widget.wrapper = {
 theme.widget.textclock = {
 	font  = theme.fonts.clock,
 	color = { text = theme.color.icon }
+}
+
+-- Pulseaudio volume control
+------------------------------------------------------------
+theme.widget.pulse = {
+	notify      = { icon = theme.path .. "/widget/audio.svg" }
 }
 
 -- Minitray

@@ -25,6 +25,7 @@ function env:init(args)
 	-- environment vars
 	self.terminal = args.terminal or "x-terminal-emulator"
   self.screensaver = args.screensaver or "xscreensaver-command --lock"
+  self.screenshooter = args.screenshotter or "xfce4-screenshooter"
 	self.mod = args.mod or "Mod4"
 	self.fm = args.fm or "nautilus"
 	self.home = os.getenv("HOME")

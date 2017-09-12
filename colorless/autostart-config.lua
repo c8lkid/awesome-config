@@ -20,6 +20,9 @@ function autostart.run()
 
 	-- keyboard layouts
 	awful.spawn.with_shell("kbdd")
+   
+  -- xscreensaver daemon
+	awful.spawn.with_shell("xscreensaver -no-splash")
 
 	-- apps
 end
